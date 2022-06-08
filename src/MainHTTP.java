@@ -1,19 +1,55 @@
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 public class MainHTTP {
+
+    public MainHTTP() {
+
+    }
+
     public static void main(String[] args) throws IOException {
-        int port;
-        if (args.length == 0) {
-            port = 8080;
-            System.out.println("Port par défaut : " + port);
-        } else {
-            port = Integer.parseInt(args[0]);
-            System.out.println("Port : " + port);
+        String port = "";
+        String link = "";
+        String index = "";
+        String accept = "";
+        String reject = "";
+
+        String FILENAME = "src/protocol.xml";
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(new File(FILENAME));
+            NodeList list = doc.getElementsByTagName("webconf");
+            for (int temp = 0; temp < list.getLength(); temp++) {
+                Node node = list.item(temp);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element = (Element) node;
+                    port = element.getElementsByTagName("port").item(0).getTextContent();
+                    System.out.println(port);
+                    link = element.getElementsByTagName("root").item(0).getTextContent();
+                    System.out.println(link);
+                    index = element.getElementsByTagName("index").item(0).getTextContent();
+                    System.out.println(index);
+                    accept = element.getElementsByTagName("accept").item(0).getTextContent();
+                    System.out.println(accept);
+                    reject = element.getElementsByTagName("reject").item(0).getTextContent();
+                    System.out.println(reject);
+                }
+            }
+        } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
         }
-        ServerSocket serverSocket = new ServerSocket(port);
+
+        ServerSocket serverSocket = new ServerSocket(Integer.parseInt(port));
         while (true) {
             try {
                 // Create a server socket
@@ -33,9 +69,10 @@ public class MainHTTP {
                 printWriter = new PrintWriter(outputStream, true);
 
                 // Read the request from the client
-                String request = bufferedReader.readLine();
-                String link = request.split(" ")[1].substring(1);
+                String request = "GET " + link + " HTTP/1.1\r\n";
                 System.out.println("Request: " + request);
+                link = request.split(" ")[1];
+                System.out.println("Link: " + link);
                 while (request != null && !request.isEmpty()) {
                     request = bufferedReader.readLine();
                     System.out.println(request);
@@ -44,7 +81,6 @@ public class MainHTTP {
                 //Ecriture de la réponse au client avec un fichier index existant
                 File file = new File(link);
                 BufferedReader bf = new BufferedReader(new FileReader(file));
-                byte[] buffer = new byte[(int) file.length()];
                 String response = "";
                 String currRes = bf.readLine();
                 while (currRes != null) {

@@ -1,3 +1,4 @@
+import com.sun.tools.javac.Main;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -9,25 +10,102 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class MainHTTP {
 
-    public MainHTTP() {
+    public static String port = "";
+    public static String link = "";
+    public static String index = "";
+    public static String accept = null;
+    public static String reject = null;
 
+    public static void run(ServerSocket serverSocket, String link) throws IOException {
+        while (true) {
+            try {
+                // Create a server socket
+                System.out.println("Server is running...");
+
+                // Create a client socket
+                Socket clientSocket = serverSocket.accept();
+                System.out.println("Client connected...");
+
+                // Create an input stream to read from the client socket
+                InputStream inputStream = clientSocket.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+                // Create an output stream to write to the client socket
+                OutputStream outputStream = clientSocket.getOutputStream();
+                PrintWriter printWriter;
+                printWriter = new PrintWriter(outputStream, true);
+
+                // Read the request from the client
+                String request = bufferedReader.readLine();
+                System.out.println(request.split(" ")[1]);
+                System.out.println(MainHTTP.link);
+                if(request.split(" ")[1].equals(MainHTTP.link) || request.split(" ")[1].equals("/")) {
+                    request = "GET " + MainHTTP.link + "/technique.html HTTP/1.1";
+                    System.out.println("ok");
+                }
+                else{
+                    request = request.split(" ")[0] + " " + MainHTTP.link + request.split(" ")[1] + " " + request.split(" ")[2 ];
+                }
+                System.out.println("Request: " + request);
+                link = request.split(" ")[1].substring(1);
+
+                //Ecriture de la réponse au client avec un fichier index existant
+                File file = new File(link);
+                System.out.println("Link : " + link);
+                DataInputStream bf = new DataInputStream(new FileInputStream(file));
+                StringBuilder response = new StringBuilder();
+                int dataRead = bf.read();
+                while (dataRead != -1) {
+                    response.append((char) dataRead);
+                    dataRead = bf.read();
+                }
+                System.out.println(response);
+                bf.close();
+                printWriter.println("HTTP/1.1 200 OK");
+                // set the content type
+                String contentType = "";
+                if (link.endsWith(".html")) {
+                    contentType = "text/html";
+                }
+                if (link.endsWith(".css")) {
+                    contentType = "text/css";
+                } else if (link.endsWith(".js")) {
+                    contentType = "application/javascript";
+                } else if (link.endsWith(".png")) {
+                    contentType = "image/png";
+                } else if (link.endsWith(".jpg")) {
+                    contentType = "image/jpg";
+                } else if (link.endsWith(".jpeg")) {
+                    contentType = "image/jpeg";
+                } else if (link.endsWith(".gif")) {
+                    contentType = "image/gif";
+                    System.out.println("yes");
+                } else if (link.endsWith(".ico")) {
+                    contentType = "image/x-icon";
+                }
+                printWriter.println("Content-Type: " + contentType);
+                printWriter.println("");
+
+                printWriter.println(response);
+                System.out.println("response = " + response);
+                printWriter.flush();
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public static void main(String[] args) throws IOException {
-        String port = "";
-        String link = "";
-        String index = "";
-        String accept = "";
-        String reject = "";
+    public static void prendreElements(String filename) throws ParserConfigurationException, SAXException, IOException {
 
-        String FILENAME = "src/protocol.xml";
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document doc = db.parse(new File(FILENAME));
+            Document doc = db.parse(new File(filename));
             NodeList list = doc.getElementsByTagName("webconf");
             for (int temp = 0; temp < list.getLength(); temp++) {
                 Node node = list.item(temp);
@@ -48,75 +126,13 @@ public class MainHTTP {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
+    }
 
+
+    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
+        String filename = "src/protocol.xml";
+        prendreElements(filename);
         ServerSocket serverSocket = new ServerSocket(Integer.parseInt(port));
-        while (true) {
-            try {
-                // Create a server socket
-                System.out.println("Server is running...");
-
-                // Create a client socket
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected...");
-
-                // Create an input stream to read from the client socket
-                InputStream inputStream = clientSocket.getInputStream();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
-                // Create an output stream to write to the client socket
-                OutputStream outputStream = clientSocket.getOutputStream();
-                PrintWriter printWriter;
-                printWriter = new PrintWriter(outputStream, true);
-
-                // Read the request from the client
-                String request = "GET " + link + " HTTP/1.1\r\n";
-                System.out.println("Request: " + request);
-                link = request.split(" ")[1];
-                System.out.println("Link: " + link);
-                while (request != null && !request.isEmpty()) {
-                    request = bufferedReader.readLine();
-                    System.out.println(request);
-                }
-
-                //Ecriture de la réponse au client avec un fichier index existant
-                File file = new File(link);
-                BufferedReader bf = new BufferedReader(new FileReader(file));
-                String response = "";
-                String currRes = bf.readLine();
-                while (currRes != null) {
-                    response += currRes + "\n";
-                    currRes = bf.readLine();
-                }
-                bf.close();
-                printWriter.println("HTTP/1.1 200 OK");
-                printWriter.println("Content-Type: text/html");
-                printWriter.println("");
-                // set the content type
-                String contentType = "text/html";
-                if (link.endsWith(".css")) {
-                    contentType = "text/css";
-                } else if (link.endsWith(".js")) {
-                    contentType = "application/javascript";
-                } else if (link.endsWith(".png")) {
-                    contentType = "image/png";
-                } else if (link.endsWith(".jpg")) {
-                    contentType = "image/jpg";
-                } else if (link.endsWith(".jpeg")) {
-                    contentType = "image/jpeg";
-                } else if (link.endsWith(".gif")) {
-                    contentType = "image/gif";
-                } else if (link.endsWith(".ico")) {
-                    contentType = "image/x-icon";
-                }
-                printWriter.println("Content-Type: " + contentType);
-
-                printWriter.println(response);
-                System.out.println("response = " + response);
-                printWriter.flush();
-                clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        run(serverSocket, link);
     }
 }

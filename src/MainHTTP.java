@@ -9,11 +9,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.util.Arrays;
 
 public class MainHTTP {
 
@@ -23,10 +21,19 @@ public class MainHTTP {
     public static String accept = null;
     public static String reject = null;
 
+    /**
+     * Méthode permettant de savoir si l'adresse IP mise en paramètre est acceptée par le serveur en fonction du fichier XML
+     * @param ip l'adresse IP en question
+     * @return boolean true si l'adresse est acceptée, false sinon
+     */
     private static boolean estAutorise(String ip) {
         return ip.equals(accept);
     }
 
+    /**
+     * Permettant de récupérer les différents éléments du fichier XML (selon son nom)
+     * @param filename le nom de l'élément à récupérer
+     */
     public static void prendreElements(String filename) throws ParserConfigurationException, SAXException, IOException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -55,6 +62,12 @@ public class MainHTTP {
         }
     }
 
+    /**
+     * Méthode s'occupant de l'excution du serveur
+     * @param serverSocket le socket du serveur
+     * @param link le lien du dossier racine
+     * @throws IOException
+     */
     public static void run(ServerSocket serverSocket, String link) throws IOException {
         System.out.println("🟢 Le serveur est fonctionnel. En l'attente d'une connexion...");
         while (true) {

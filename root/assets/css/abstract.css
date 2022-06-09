@@ -1,0 +1,290 @@
+/*@keyframes color {
+    from{
+        background: radial-gradient(rgba(41, 241, 195, 1), rgba(78, 205, 196, 1), rgba(213, 184, 255, 1));
+    }
+    to {
+        background: radial-gradient(rgba(213, 184, 255, 1), rgba(123, 239, 178, 1), rgba(134, 226, 213, 1));
+    }
+}*/
+
+@import url('http://fonts.cdnfonts.com/css/pusab');
+
+
+html {
+    background: rgb(76,9,121);
+    transition: all 2s;
+       animation-name: color;
+       animation-duration: 2s;
+       animation-direction: reverse;
+       animation-iteration-count: infinite;
+       color : darkslategrey;
+       background: radial-gradient(rgba(41, 241, 195, 1), rgba(78, 205, 196, 1), rgba(213, 184, 255, 1));
+       font-family: cursive;
+       height: 100%;
+   }
+   
+   body {
+       /* Utile pour mieux constater les hauteurs relatives */
+       /* Attention : bien comprendre que cela contraint la hauteur de cet */
+       /* éléments à la hauteur disponible dans le navigateur (via html) */
+       background-attachment: local;
+   }
+   
+   
+   
+   @keyframes simple {
+     from {
+       margin-left: 10%;
+     }
+   
+     to {
+       margin-left: 25%;
+     }
+   }
+   
+   @keyframes scale{
+     from {
+       transform: scale(1);
+     }
+   
+     to {
+       transform: scale(3, 60);
+       background-color: black;
+       color : black;
+       border-radius : 0;
+     }
+   }
+   @keyframes rotation {
+     from {
+       transform: rotate(0deg) scale(1);
+     }
+   
+     to {
+       transform: rotate(360deg) scale(5);
+     }
+   }
+   
+   
+   
+   h3 {
+       font-size : 2em;
+       margin-right  : 0 auto;
+       text-align: left;
+       margin-left:0% ;
+       background-color: lightblue;
+       text-decoration: underline;
+       transition :  all 2s;
+   }
+   h3:hover {
+       margin-left : 25%;
+       text-decoration : none;
+   }
+   h3:active{
+       transform: scale(0.1, 5);
+   }
+   
+   
+   
+   em.em4 {
+       background-color: yellow;
+       display : block;
+       min-height : 20px;
+       text-align : center;
+       font-size: 1em;
+       width : 90%;
+       padding: 2% 5%;
+       transition : width 2s, color 2s,font-size 2s, height 2s, background-color 3s, transform 0.5s;
+       
+       margin-bottom: 10px;
+       margin-left : 5px;
+   
+       border-color: grey;
+       border-width: 1px ;
+       border-style: solid;
+   
+       border-radius: 10px;
+       animation-name: scale;
+       animation-duration: 1s;
+       animation-timing-function: ease-in;
+       animation-iteration-count: 1;
+       animation-direction: reverse;
+   }
+   .em4:active {
+       transform: skew(50deg) scale(5);
+   }
+   
+   
+   
+   em.em1 {
+       background-color: mediumpurple;
+       display : block;
+       min-height : 20px;
+       text-align : center;
+       font-size: 1em;
+       width : 80%;
+       padding: 2% 5%;
+       transition : width 2s, color 2s,font-size 2s, height 2s, background-color 3s, transform 3s;
+      
+       animation-direction: alternate;
+       margin-bottom: 10px;
+       margin-left : 5px;
+   
+       border-color: grey;
+       border-width: 1px ;
+       border-style: solid;
+   
+       border-radius: 10px;
+   
+   }
+   .em1:active {
+       transform: scale(0.2, 2);
+   }
+   .em1 a {
+       transition : font-size 0.5s, transform 0.5s;
+   }
+   .em1 a:hover {
+       font-size: 2em;
+   }
+   
+   
+   
+   em.em2 {
+       background-color : rgba(173,255,47, 0.3);
+       display : block;
+       height : 50%;
+       width : 50%;
+       margin-left: 150px;
+       overflow: hidden;
+       transition: width 2s, height 2s, background-color 3s, transform 3s;
+   
+       padding-top: 3px;
+       padding-top: 5px;
+       padding-bottom: 15px;
+   
+   
+       padding-bottom: 3px;
+       padding-right: 8px;
+       padding-left: 2%;
+   
+       border-color: rgba(255,255,255,0.7);
+       border-width: 2px ;
+       border-style: solid;
+       backdrop-filter: blur(9px);
+   
+       border-top-right-radius: 50px 30%;
+   
+       margin-left: 25%;
+   }
+   
+   .em2:hover {
+       background-color: white;
+       width: 200px;
+       height: 200px;
+   }
+   .em2:active {
+       transform: rotate(360deg) scale(1.5);
+       background-color : pink;
+   }
+   
+   
+   
+   em.em3 {
+       border-style: solid;
+       border-width: 1px;
+       display: block;
+       width: 80%;
+       height: 100px;
+       color : white;
+       background-color: rgba(0, 0, 255, 0.3);
+       transition: width 2s, height 2s, margin-left 2s, color 2s, border-radius 3s, border-width 2s, background-color 2s, transform 2s;
+   
+       display : block;
+       width : 90%;
+       min-width : 100px;
+       padding : 6%;
+       margin-top: 20px;
+       overflow : hidden;
+   
+   
+       border-color : white;
+       backdrop-filter: blur(9px);
+   
+       border-bottom-left-radius: 40% 75px ;
+       border-bottom-right-radius:40% 75px ;
+   }
+   
+   .em3:hover {
+       background-color: #FFCCCC;
+       width: 200px;
+       height: 200px;
+       transform: scale(0.2);
+       border-radius : 50%;
+       border-width : 0px;
+       color : #FFCCCC;
+       margin-left : 25%
+   }
+   .em3:active {
+       transform:  scale(1, 5);
+   }
+   
+   
+   
+   p {
+       font-size: 0.7em;
+       text-align: center;
+       width : 40px;
+       height : 40px;
+       margin-left: 25%;
+       background-color : blueviolet;
+       border-radius : 50%;
+       border-width: 0.1px;
+       border-style : solid;
+       transition : width 0.5s, height 0.5s, border-width 2s, border-style 2s, background-color 3s, transform 3s, border-radius 2s;
+       animation-duration: 2s;
+       animation-name: rotation;
+       animation-iteration-count: infinite;
+       animation-direction:alternate;
+   }
+   
+   p:active {
+       transform : scale(30, 2);
+       border-radius : 0%;
+       background-color: lightblue;
+       border-width : 8.0px;
+       border-style : double;
+       width : 200px;
+       height: 200px;
+   }
+   
+   
+   
+   h4 {
+       margin-top: 500px;
+       transition: all 2s;
+       text-align: center;
+   }
+   h4:hover {
+       transform : scale(5) skew(60deg);
+   }
+   
+   .image{
+       overflow:hidden;
+   }
+   
+   
+   .image img {
+       transition: all 1s;
+       width : 600px;
+       height : 600px;
+       animation-duration:1s;
+       animation-name: simple;
+       animation-iteration-count: infinite;
+       animation-direction: alternate;
+       margin : 0% 25%;
+       opacity: 100%;
+       overflow: hidden;
+   }
+   img:active {
+       opacity: 100%;
+       transform : scale(200) rotate(5000deg);
+   }

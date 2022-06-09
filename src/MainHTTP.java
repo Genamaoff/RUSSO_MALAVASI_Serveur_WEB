@@ -12,6 +12,8 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import static java.lang.Integer.toBinaryString;
+
 public class MainHTTP {
 
     public static String port = "";
@@ -41,30 +43,23 @@ public class MainHTTP {
 
                 // Read the request from the client
                 String request = bufferedReader.readLine();
-                System.out.println(request.split(" ")[1]);
-                System.out.println(MainHTTP.link);
-                if(request.split(" ")[1].equals(MainHTTP.link) || request.split(" ")[1].equals("/")) {
-                    request = "GET " + MainHTTP.link + "/technique.html HTTP/1.1";
-                    System.out.println("ok");
-                }
-                else{
-                    request = request.split(" ")[0] + " " + MainHTTP.link + request.split(" ")[1] + " " + request.split(" ")[2 ];
+                System.out.println("Request: " + request);
+                if (request == null || !new File(link + request).exists()) {
+                    request = "GET " + MainHTTP.link + "/error404.html HTTP/1.1";
+                } else {
+                    System.out.println(request.split(" ")[1]);
+                    System.out.println(MainHTTP.link);
+                    if (request.split(" ")[1].equals(MainHTTP.link) || request.split(" ")[1].equals("/")) {
+                        request = "GET " + MainHTTP.link + "/technique.html HTTP/1.1";
+                        System.out.println("ok");
+                    } else {
+                        request = request.split(" ")[0] + " " + MainHTTP.link + request.split(" ")[1] + " " + request.split(" ")[2];
+                    }
                 }
                 System.out.println("Request: " + request);
                 link = request.split(" ")[1].substring(1);
 
                 //Ecriture de la réponse au client avec un fichier index existant
-                File file = new File(link);
-                System.out.println("Link : " + link);
-                DataInputStream bf = new DataInputStream(new FileInputStream(file));
-                StringBuilder response = new StringBuilder();
-                int dataRead = bf.read();
-                while (dataRead != -1) {
-                    response.append((char) dataRead);
-                    dataRead = bf.read();
-                }
-                System.out.println(response);
-                bf.close();
                 printWriter.println("HTTP/1.1 200 OK");
                 // set the content type
                 String contentType = "";
@@ -83,14 +78,32 @@ public class MainHTTP {
                     contentType = "image/jpeg";
                 } else if (link.endsWith(".gif")) {
                     contentType = "image/gif";
-                    System.out.println("yes");
                 } else if (link.endsWith(".ico")) {
                     contentType = "image/x-icon";
                 }
                 printWriter.println("Content-Type: " + contentType);
+                printWriter.print("");
+                printWriter.println("responseType:'arraybuffer'");
                 printWriter.println("");
 
-                printWriter.println(response);
+                File file = new File(link);
+                System.out.println("Link : " + link);
+                DataInputStream bf = new DataInputStream(new FileInputStream(file));
+                StringBuilder response = new StringBuilder();
+                int dataRead = bf.read();
+
+                while (dataRead != -1) {
+                    if (contentType.equals("text/html")) {
+                        response.append((char) dataRead);
+                    } else {
+                        //convert the int to an gif image for HTTP
+                        response.append((char) dataRead);
+                    }
+                    dataRead = bf.read();
+                }
+                System.out.println(response);
+                bf.close();
+                printWriter.print(response);
                 System.out.println("response = " + response);
                 printWriter.flush();
                 clientSocket.close();

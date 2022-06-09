@@ -1,7 +1,8 @@
-import com.sun.tools.javac.Main;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -9,10 +10,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-
-import static java.lang.Integer.toBinaryString;
 
 public class MainHTTP {
 
@@ -23,45 +20,61 @@ public class MainHTTP {
     public static String reject = null;
 
     public static void run(ServerSocket serverSocket, String link) throws IOException {
+        System.out.println("🟢 Le serveur est fonctionnel. En l'attente d'une connexion...");
         while (true) {
             try {
-                // Create a server socket
-                System.out.println("Server is running...");
-
-                // Create a client socket
+                // Création d'un serveur socket pour le client dans le but de l'accepter
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected...");
-
-                // Create an input stream to read from the client socket
+                // Création d'un inputstream et d'un BufferedReader pour le client (réception de ses demandes)
                 InputStream inputStream = clientSocket.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
-                // Create an output stream to write to the client socket
+                System.out.println("💡 Client connecté");
+
+                // Création d'un outputstream et d'un PrintWriter pour le client (envoi de ses réponses)
                 OutputStream outputStream = clientSocket.getOutputStream();
                 PrintWriter printWriter;
                 printWriter = new PrintWriter(outputStream, true);
 
-                // Read the request from the client
-                String request = bufferedReader.readLine();
-                System.out.println("Request: " + request);
-                if (request == null || !new File(link + request).exists()) {
-                    request = "GET " + MainHTTP.link + "/error404.html HTTP/1.1";
-                } else {
-                    System.out.println(request.split(" ")[1]);
-                    System.out.println(MainHTTP.link);
-                    if (request.split(" ")[1].equals(MainHTTP.link) || request.split(" ")[1].equals("/")) {
-                        request = "GET " + MainHTTP.link + "/technique.html HTTP/1.1";
-                        System.out.println("ok");
-                    } else {
-                        request = request.split(" ")[0] + " " + MainHTTP.link + request.split(" ")[1] + " " + request.split(" ")[2];
-                    }
-                }
-                System.out.println("Request: " + request);
-                link = request.split(" ")[1].substring(1);
+                // Lecture de la requête du client non nulle
+                String request = "";
+                request = bufferedReader.readLine();
+                System.out.println("non mais !");
+                System.out.println(request);
+                System.out.println("💡 Requête reçue : " + request);
+                String[] parts = request.split(" ");
 
-                //Ecriture de la réponse au client avec un fichier index existant
+                String method = parts[0];
+                String path = parts[1];
+                String version = parts[2];
+
+                File fileTest = new File(MainHTTP.link + path);
+                System.out.println(MainHTTP.link + path);
+                System.out.println(request.split(" ")[1]);
+                System.out.println(MainHTTP.link);
+                if (path.equals(MainHTTP.link) || path.equals("/")) {
+                    request = method + " " + MainHTTP.link + "/technique.html " + version;
+                    System.out.println("ok");
+                } else {
+                    request = method + " " + MainHTTP.link + path + " " + version;
+                }
+
+                System.out.println("Request: " + request);
+                path = request.split(" ")[1];
+                link = path.substring(1);
+
+                System.out.println(link);
+
+                if (new File(link).exists()) {
+                    System.out.println("ok");
+                } else {
+                    System.out.println("ko");
+                    link = MainHTTP.link.substring(1) + "/error404.html";
+                }
+                //Ecriture de la réponse au client
                 printWriter.println("HTTP/1.1 200 OK");
-                // set the content type
+
+                // Choix du content-type pour le codage de la réponse
                 String contentType = "";
                 if (link.endsWith(".html")) {
                     contentType = "text/html";
@@ -93,12 +106,7 @@ public class MainHTTP {
                 int dataRead = bf.read();
 
                 while (dataRead != -1) {
-                    if (contentType.equals("text/html")) {
-                        response.append((char) dataRead);
-                    } else {
-                        //convert the int to an gif image for HTTP
-                        response.append((char) dataRead);
-                    }
+                    response.append((char) dataRead);
                     dataRead = bf.read();
                 }
                 System.out.println(response);
@@ -125,15 +133,15 @@ public class MainHTTP {
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
                     Element element = (Element) node;
                     port = element.getElementsByTagName("port").item(0).getTextContent();
-                    System.out.println(port);
+                    System.out.println("Port = " + port);
                     link = element.getElementsByTagName("root").item(0).getTextContent();
-                    System.out.println(link);
+                    System.out.println("Link = " + link);
                     index = element.getElementsByTagName("index").item(0).getTextContent();
-                    System.out.println(index);
+                    System.out.println("Index = " + index);
                     accept = element.getElementsByTagName("accept").item(0).getTextContent();
-                    System.out.println(accept);
+                    System.out.println("Accept = " + accept);
                     reject = element.getElementsByTagName("reject").item(0).getTextContent();
-                    System.out.println(reject);
+                    System.out.println("Reject = " + reject);
                 }
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {

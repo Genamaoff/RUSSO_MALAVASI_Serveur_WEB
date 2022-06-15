@@ -110,6 +110,7 @@ public class MainHTTP {
                 System.out.println("💡 Requête reçue : " + request);
                 String[] parts = request.split(" ");
 
+                // Coupe en plusieurs morceaux la requête dans des variables pour plus de clarté
                 String method = parts[0];
                 System.out.println(method);
                 String path = parts[1];
@@ -120,6 +121,8 @@ public class MainHTTP {
                 System.out.println(MainHTTP.link + path);
                 System.out.println(request.split(" ")[1]);
                 System.out.println(MainHTTP.link);
+
+                // Vérifie si le chemin existe, et traite s'il n'y a pas de chemin écrit
                 if (path.equals(MainHTTP.link) || path.equals("/")) {
                     request = method + " " + MainHTTP.link + "/technique.html " + version;
                     System.out.println("ok");
@@ -133,10 +136,11 @@ public class MainHTTP {
 
                 System.out.println(link);
 
+                // Vérifie si le fichier existe, et si cela est le cas, il le confirme. Si ce n'est pas le cas, il charge la page HTML de l'erreur 404
                 if (new File(link).exists()) {
-                    System.out.println("ok");
+                    System.out.println("Fichier existant");
                 } else {
-                    System.out.println("ko");
+                    System.out.println("Fichier inexistant");
                     link = MainHTTP.link.substring(1) + "/error404.html";
                 }
 
@@ -169,6 +173,7 @@ public class MainHTTP {
                 printWriter.println("responseType:'arraybuffer'");
                 printWriter.println("");
 
+                // S'occupe d'écrire les données
                 File file = new File(link);
                 System.out.println("Link : " + link);
                 DataInputStream bf = new DataInputStream(new FileInputStream(file));
@@ -186,19 +191,31 @@ public class MainHTTP {
     }
 
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
+        // Mise en place du nom du fichier de configuration
         String filename = "src/protocol.xml";
+        // Appel de la méthode pour prendre les éléments par rapport au chemin
         prendreElements(filename);
+        // Création du Socket pour établir un contact avec le client plus tard
         ServerSocket serverSocket = new ServerSocket(Integer.parseInt(port));
         System.out.println("🟢 Le serveur est fonctionnel. En l'attente d'une connexion...");
+
+        // S'occupe de prendre le PID (Process ID) du programme Java
         RuntimeMXBean runMX = ManagementFactory.getRuntimeMXBean();
-        String pidCurr = runMX.getName().split("@Ubuntu20")[0];
+        // String stockant le PID (Ce dernier étant noté avec "PID@Ubuntu20", nous devons effectuer un split pour uniquement garder le PID)
+        String pidCurr = runMX.getName().split("@Ubuntu20")[0];é
+        // Création d'un fichier qui se chargera de stocker le PID courant
         File filePID = new File("/var/run/myweb.pid");
+        // Création d'un PrintWriter chargé d'écrire les données dans le fichier donné
         PrintWriter pwID = new PrintWriter(filePID);
+        // Ecriture des données présentes dans le String précédent
         pwID.println(pidCurr);
+        // Fermeture du PrintWriter
         pwID.close();
+
+        // Boucle While permettant de charger le serveur indéfiniment
         while (true) {
             run(serverSocket, link);
-            System.out.println("e");
+            System.out.println("Nouvelle requête :");
         }
     }
 }

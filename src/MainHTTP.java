@@ -8,6 +8,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -188,6 +190,12 @@ public class MainHTTP {
         prendreElements(filename);
         ServerSocket serverSocket = new ServerSocket(Integer.parseInt(port));
         System.out.println("🟢 Le serveur est fonctionnel. En l'attente d'une connexion...");
+        RuntimeMXBean runMX = ManagementFactory.getRuntimeMXBean();
+        String pidCurr = runMX.getName().split("@Ubuntu20")[0];
+        File filePID = new File("/var/run/myweb.pid");
+        PrintWriter pwID = new PrintWriter(filePID);
+        pwID.println(pidCurr);
+        pwID.close();
         while (true) {
             run(serverSocket, link);
             System.out.println("e");

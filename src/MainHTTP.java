@@ -10,7 +10,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -30,7 +29,26 @@ public class MainHTTP {
      * @return boolean true si l'adresse est acceptée, false sinon
      */
     private static boolean estAutorise(String ip) {
-        return ip.equals(accept);
+        int sizeIPReject = reject.length();
+        System.out.println(sizeIPReject + " et oui");
+        String ipRej = reject;
+        String ipBegin = "";
+        String stringCurrent = "";
+        String charAtCurrent = "";
+        if (reject.contains("/")) {
+            ipRej = ipRej.split("/")[0];
+            sizeIPReject = ipRej.length();
+        }
+        for (int i = 0; i < sizeIPReject; i++) {
+            charAtCurrent = "" + ipRej.charAt(i);
+            stringCurrent += charAtCurrent;
+            if (!charAtCurrent.equals("0")) {
+                ipBegin = stringCurrent;
+            }
+        }
+        System.out.println("IP : " + ip);
+        System.out.println("IPBegin : " + ipBegin);
+        return ip.startsWith(ipBegin);
     }
 
     /**
@@ -38,7 +56,8 @@ public class MainHTTP {
      *
      * @param filename le nom de l'élément à récupérer
      */
-    public static void prendreElements(String filename) throws ParserConfigurationException, SAXException, IOException {
+    public static void prendreElements(String filename) throws
+            ParserConfigurationException, SAXException, IOException {
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -202,7 +221,7 @@ public class MainHTTP {
         // S'occupe de prendre le PID (Process ID) du programme Java
         RuntimeMXBean runMX = ManagementFactory.getRuntimeMXBean();
         // String stockant le PID (Ce dernier étant noté avec "PID@Ubuntu20", nous devons effectuer un split pour uniquement garder le PID)
-        String pidCurr = runMX.getName().split("@Ubuntu20")[0];é
+        String pidCurr = runMX.getName().split("@Ubuntu20")[0];
         // Création d'un fichier qui se chargera de stocker le PID courant
         File filePID = new File("/var/run/myweb.pid");
         // Création d'un PrintWriter chargé d'écrire les données dans le fichier donné
